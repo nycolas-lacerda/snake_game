@@ -1,0 +1,17 @@
+# Configurações globais
+
+WIDTH = 600
+HEIGHT = 480
+MARGIN_Y = 60
+MARGIN_X = 48
+BORDER_SIZE = 2
+CELL_SIZE = 12
+FPS = 10
+PLAY_WIDTH = WIDTH - (MARGIN_X * 2)
+PLAY_HEIGHT = HEIGHT - (MARGIN_Y * 2)
+
+# Cores
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED   = (255, 0, 0)
+WHITE = (255, 255, 255)
