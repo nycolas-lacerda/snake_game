@@ -5,6 +5,7 @@ from core.food import Food
 from core.scoreboard import Scoreboard
 from core.highscore import Highscore
 from settings import *
+import sys
 
 class Game:
     def __init__(self):
@@ -12,18 +13,24 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Snake Game")
         self.clock = pygame.time.Clock()
-
-        self.snake = Snake(MARGIN_X, MARGIN_Y, CELL_SIZE, GREEN)
+        self.difficulty = "normal"
+        self.snake = Snake(MARGIN_X, MARGIN_Y, CELL_SIZE, GREEN, self.difficulty)
         self.food = Food(WIDTH, HEIGHT, CELL_SIZE, RED)
         self.scoreboard = Scoreboard()
-        self.highscore_manager = Highscore()
+        self.highscore_manager = Highscore(self.difficulty)
 
-    def run(self):
+    def set_difficulty(self, difficulty):
+        self.difficulty = difficulty
+        self.snake = Snake(MARGIN_X, MARGIN_Y, CELL_SIZE, GREEN, self.difficulty)
+        self.highscore_manager = Highscore(self.difficulty)
+
+    def run(self, difficulty):
         running = True
+        self.set_difficulty(difficulty)
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    return ['quit', self.scoreboard.score]
                 elif event.type == pygame.KEYDOWN:
                     match event.key:
                         case pygame.K_UP if self.snake.y_vel == 0:
@@ -39,15 +46,12 @@ class Game:
                             # self.snake.x_vel, self.snake.y_vel = CELL_SIZE, 0
                             self.snake.set_direction('RIGHT')
 
-            self.snake.move()
-
-            head_x, head_y = self.snake.body[-1]
-            if (head_x < MARGIN_X or head_x == MARGIN_X + PLAY_WIDTH
-                    or head_y < MARGIN_Y or head_y == MARGIN_Y + PLAY_HEIGHT):
-                running = False
+            moving = self.snake.move()
+            if moving == False:
+                return ['gameover', self.scoreboard.score]
 
             if self.snake.check_self_collision():
-                running = False
+                return ['gameover', self.scoreboard.score]
 
             if (self.snake.body[-1][0] == self.food.x
                     and self.snake.body[-1][1] == self.food.y):
@@ -69,3 +73,7 @@ class Game:
             self.clock.tick(FPS)
 
         pygame.quit()
+
+    def quit(self):
+        pygame.quit()
+        sys.exit()

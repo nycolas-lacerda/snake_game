@@ -1,12 +1,14 @@
 from time import sleep
 
 import pygame
+from pygame.examples.audiocapture import sound
 
 from settings import *
+from core.sound_manager import SoundManager
 
 
 class Snake:
-    def __init__(self, x, y, size, color):
+    def __init__(self, x, y, size, color, difficulty="normal"):
         self.body = [[x, y]]
         self.size = size
         self.color = color
@@ -14,14 +16,23 @@ class Snake:
         self.y_vel = 0
         self.growing = False
         self.direction = "RIGHT"
+        self.difficulty = difficulty
+        self.sound = SoundManager()
 
     def move(self):
         head = self.body[-1].copy()
         head[0] += self.x_vel
         head[1] += self.y_vel
-
-        head[0] = ((head[0] - MARGIN_X) % PLAY_WIDTH) + MARGIN_X
-        head[1] = ((head[1] - MARGIN_Y) % PLAY_HEIGHT) + MARGIN_Y
+        if self.difficulty == "normal":
+            head[0] = ((head[0] - MARGIN_X) % PLAY_WIDTH) + MARGIN_X
+            head[1] = ((head[1] - MARGIN_Y) % PLAY_HEIGHT) + MARGIN_Y
+        elif self.difficulty == "hard":
+            # colisão com parede
+            if (
+                head[0] < MARGIN_X or head[0] >= PLAY_WIDTH + MARGIN_X or
+                head[1] < MARGIN_Y or head[1] >= PLAY_HEIGHT + MARGIN_Y
+            ):
+                return False
 
         self.body.append(head)
 
@@ -29,9 +40,11 @@ class Snake:
             self.body.pop(0)
         else:
             self.growing = False
+        return True
 
     def grow(self):
         self.growing = True
+        self.sound.play_sound('eat')
 
     def check_self_collision(self):
         if len(self.body) < 4:
@@ -43,11 +56,11 @@ class Snake:
         return False
 
     def set_direction(self, direction):
-        # evita virar 180° direto
+        self.sound.play_sound('move')
         if (direction == "UP" and self.direction != "DOWN") or \
-           (direction == "DOWN" and self.direction != "UP") or \
-           (direction == "LEFT" and self.direction != "RIGHT") or \
-           (direction == "RIGHT" and self.direction != "LEFT"):
+                (direction == "DOWN" and self.direction != "UP") or \
+                (direction == "LEFT" and self.direction != "RIGHT") or \
+                (direction == "RIGHT" and self.direction != "LEFT"):
             self.direction = direction
             if direction == "UP":
                 self.x_vel, self.y_vel = 0, -CELL_SIZE

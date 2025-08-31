@@ -3,8 +3,8 @@ import pygame
 from settings import *
 
 class Highscore:
-    def __init__(self, filename="highscore"):
-        self.filename = filename
+    def __init__(self, filename="normal"):
+        self.filename = f"scores/{filename}"
         self.highscore = self.load_highscore()
         self.font = pygame.font.SysFont("Arial", 25)
 
