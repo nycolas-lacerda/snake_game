@@ -45,7 +45,8 @@ class Game:
                         case pygame.K_RIGHT if self.snake.x_vel == 0:
                             # self.snake.x_vel, self.snake.y_vel = CELL_SIZE, 0
                             self.snake.set_direction('RIGHT')
-
+                        case pygame.K_ESCAPE:
+                            return ['menu', self.scoreboard.score]
             moving = self.snake.move()
             if moving == False:
                 return ['gameover', self.scoreboard.score]
